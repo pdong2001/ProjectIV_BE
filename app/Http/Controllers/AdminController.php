@@ -43,4 +43,7 @@ class AdminController extends Controller
     {
         return view('admin/pages/product-detail-list');
     }
+    public function missingMethod($parameters = array()){
+        return $parameters;
+    }
 }

@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\BlobResource;
 use App\Models\Blob;
 use App\Models\ImageAssign;
+use App\Models\Product;
+use App\Models\ProductDetail;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -22,12 +24,12 @@ class FileApiController extends Controller
             $query->join('image_assigns', 'blobs.id', '=', 'image_assigns.blob_id')
                 ->where('image_assigns.imageable_type', '=', 'App\\Models\\ProductDetail')
                 ->where('image_assigns.imageable_id', '=', $request['product_detail_id'])
-                ->get(['blobs.*']);
+                ->select(['blobs.*']);
         } else if (isset($request['product_id']) && $request['product_id'] != 0) {
             $query->join('image_assigns', 'blobs.id', '=', 'image_assigns.blob_id')
                 ->where('image_assigns.imageable_type', '=', 'App\\Models\\Product')
                 ->where('image_assigns.imageable_id', '=', $request['product_id'])
-                ->get(['blobs.*']);
+                ->select(['blobs.*']);
         }
         $page_index = $request->get('page') ?? 1;
         $page_size = $request->get('limit') ?? 10;
@@ -61,7 +63,7 @@ class FileApiController extends Controller
                 $blob = Blob::create([
                     'name' => $blob->name,
                     'file_path' => $fileName,
-                    'created_by' => 20
+                    'created_by' =>  Auth::user()->id
                 ]);
                 return response()->json([
                     'code' => Response::HTTP_OK,
@@ -84,7 +86,7 @@ class FileApiController extends Controller
             $blob = Blob::create([
                 'name' => $request->get('name') ?? $file->getClientOriginalName(),
                 'file_path' => $result,
-                'created_by' => 20
+                'created_by' =>  Auth::user()->id
             ]);
             return response()->json([
                 'code' => Response::HTTP_OK,
@@ -147,7 +149,7 @@ class FileApiController extends Controller
                     Blob::create([
                         'name' => $name,
                         'file_path' => $result,
-                        'created_by' => Auth::user()->id ?? 0
+                        'created_by' => Auth::user()->id
                     ]);
                     $inserted++;
                 }
@@ -236,6 +238,10 @@ class FileApiController extends Controller
                             if ($checkFile == $file) {
                                 $assigns = $v->assigns();
                                 $assigns->update(['blob_id' => $value->id]);
+                                Product::where('default_image', $v->id)
+                                ->update(['default_image' => $value->id]);
+                                ProductDetail::where('default_image', $v->id)
+                                ->update(['default_image' => $value->id]);
                                 unlink(storage_path('app/' . $v->file_path));
                                 $v->delete();
                                 unset($blobs[$k]);

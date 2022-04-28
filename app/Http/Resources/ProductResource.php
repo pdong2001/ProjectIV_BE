@@ -33,6 +33,7 @@ class ProductResource extends JsonResource
             'provider' => new CategoryResource($this->whenLoaded('provider')),
             'visible' => $this->visible,
             'description' => $this->description,
+            'options' =>ProductOptionResource::collection($this->whenLoaded('options')),
             ...Product::tArray($this)
         ];
     }

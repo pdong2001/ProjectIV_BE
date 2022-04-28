@@ -20,22 +20,19 @@ class ProductDetail extends FullAuditedEntity
 
     public const RULES = [
         'product_id' => 'required',
-        'option_name' => 'required',
-        'option_value' => 'required',
         'in_price' => 'required|min:0',
         'out_price' => 'required|min:0',
         'unit' => 'required',
+        'options' => 'required'
     ];
 
     protected $casts = [
         'visible' => 'boolean'
     ];
 
-    protected $fillable = [
+    public $fillable = [
         ...parent::FILLABLE,
         "id",
-        "option_name",
-        "option_value",
         "out_price",
         "in_price",
         "remaining_quantity",
@@ -59,5 +56,10 @@ class ProductDetail extends FullAuditedEntity
     public function image()
     {
         return $this->hasOne(Blob::class, 'id', 'default_image');
+    }
+
+    public function options()
+    {
+        return $this->hasMany(ProductDetailOptionValue::class, 'product_detail_id', 'id');
     }
 }

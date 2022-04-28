@@ -45,7 +45,7 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $e)
     {
         return response()->json([
-            'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
+            'code' => $e->getCode(),
             'status' => false,
             'message' => $e->getMessage(),
             'trace' => $e->getTrace(),

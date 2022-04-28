@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceDetail;
 use App\Services\InvoiceDetailService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -61,7 +62,7 @@ class InvoiceDetailApiController extends Controller
     {
         try {
             $data = $request->post();
-            $data['created_by']=20;
+            $data['created_by']= Auth::user()->id;
             $validator = Validator::make($data,  InvoiceDetail::RULES);
             if ($validator->fails()) {
                 $response = response()->json([
@@ -70,7 +71,7 @@ class InvoiceDetailApiController extends Controller
                     'message' => $validator->errors()
                 ]);
             } else {
-                $data['created_by'] = 20;
+                $data['created_by'] =  Auth::user()->id;
                     $result = $this->invoice_detail_service->create($data);
                     $response = response()->json([
                         'code' => Response::HTTP_OK,
@@ -113,7 +114,7 @@ class InvoiceDetailApiController extends Controller
     {
         try {
             $data = $request->all();
-            $data['last_updated_by'] = 20;
+            $data['last_updated_by'] =  Auth::user()->id;
             $result = $this->invoice_detail_service->update($id, $data);
             $response = response()->json([
                 'code' => Response::HTTP_OK,

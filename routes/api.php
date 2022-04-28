@@ -28,14 +28,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware([])->prefix('admin')->group(function () {
+Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/user', function (Request $request) {
         return response()->json([
             'code' => Response::HTTP_OK,
             'status' => true,
             'data' => new UserResource(Auth::user()),
             'meta' => []
-
         ]);
     });
     Route::resource('products', ProductApiController::class)->except(['edit', 'create']);
@@ -61,9 +60,10 @@ Route::get('blobs/{id}', [FileApiController::class, 'getByBlob'])->name('file.bl
 Route::get('blobs/{id}', [FileApiController::class, 'getByBlob'])->name('file.blob');
 Route::get('blobs/download/{id}', [FileApiController::class, 'downloadById'])->name('file.blob');
 Route::get('file/download/{name}', [FileApiController::class, 'download'])->name('file.download');
+Route::get('product', [ProductApiController::class, 'index'])->name('home.product');
+Route::get('product/{id}', [ProductApiController::class, 'show'])->name('home.product.show');
 
 Route::prefix('admin')->group(function() {
-    // Route::post('register', [RegisterApiController::class, 'register'])->name('auth.register');
     Route::post('login', [AuthenticationApiController::class, 'adminLogin'])->name('auth.admin.login');
 });
 

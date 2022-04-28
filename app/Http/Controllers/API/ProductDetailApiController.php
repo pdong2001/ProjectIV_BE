@@ -7,6 +7,7 @@ use App\Model\Product;
 use App\Models\ProductDetail;
 use App\Services\ProductDetailService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -64,7 +65,7 @@ class ProductDetailApiController extends Controller
     {
         try {
             $data = $request->post();
-            $data['created_by']=20;
+            $data['created_by']= Auth::user()->id;
             $validator = Validator::make($data,  ProductDetail::RULES);
             if ($validator->fails()) {
                 $response = response()->json([
@@ -73,8 +74,8 @@ class ProductDetailApiController extends Controller
                     'message' => $validator->errors()
                 ]);
             } else {
-                $data['created_by'] = 20;
-                    $result = $this->product_detail_service->create($data);
+                $data['created_by'] =  Auth::user()->id;
+                    $result = $this->product_detail_service->create($data, $data['options']);
                     $response = response()->json([
                         'code' => Response::HTTP_OK,
                         'status' => $result > 0,
@@ -115,9 +116,9 @@ class ProductDetailApiController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $data = $request->all();
-            $data['last_updated_by'] = 20;
-            $result = $this->product_detail_service->update($id, $data);
+            $data = $request->except('options');
+            $data['last_updated_by'] =  Auth::user()->id;
+            $result = $this->product_detail_service->update($id, $data, $request['options']);
             $response = response()->json([
                 'code' => Response::HTTP_OK,
                 'status' => $result,

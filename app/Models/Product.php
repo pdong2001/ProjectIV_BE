@@ -81,4 +81,9 @@ class Product extends FullAuditedEntity
     {
         return $this->belongsTo(Provider::class, 'provider_id', 'id');
     }
+
+    public function options()
+    {
+        return $this->hasMany(ProductOption::class, 'product_id', 'id');
+    }
 }

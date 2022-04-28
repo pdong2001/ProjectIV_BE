@@ -16,8 +16,6 @@ return new class extends Migration
     {
         Schema::create('product_details', function (Blueprint $table) {
             $table->unsignedBigInteger('product_id');
-            $table->string('option_name');
-            $table->string('option_value');
             $table->unsignedBigInteger('out_price');
             $table->unsignedBigInteger('in_price')->nullable();
             $table->bigInteger('remaining_quantity');

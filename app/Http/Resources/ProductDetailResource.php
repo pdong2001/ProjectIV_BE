@@ -31,7 +31,8 @@ class ProductDetailResource extends JsonResource
             'images' => ImageAssignResource::collection($this->whenLoaded('images')),
             'default_image' => new BlobResource($this->whenLoaded('image')),
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at
+            'updated_at' => $this->updated_at,
+            'options' => ProductDetailOptionValueResource::collection($this->whenLoaded('options'))
         ];
     }
 }

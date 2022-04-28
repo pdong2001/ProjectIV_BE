@@ -18,12 +18,3 @@ use Illuminate\Http\Request;
 //     return view('welcome');
 // });
 
-
-
-Route::prefix('admin')->group(function() {
-    Route::get('home', [AdminController::class, 'Index']);
-    Route::get('product', [AdminController::class, 'Product']);
-    Route::get('product/{id}', [AdminController::class, 'ProductDetail']);
-    Route::get('product-detail', [AdminController::class, 'ProductDetails']);
-    Route::get('category', [AdminController::class, 'Category']);
-});

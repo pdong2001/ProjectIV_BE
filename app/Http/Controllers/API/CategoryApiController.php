@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Services\CategoryService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 // use Symfony\Component\HttpFoundation\Response;
 
@@ -68,7 +69,7 @@ class CategoryApiController extends Controller
                     'message' => $validator->errors()
                 ]);
             } else {
-                $data['created_by'] = 20;
+                $data['created_by'] =  Auth::user()->id;
                 $result = $this->category_service->create($data);
                 $response = response()->json([
                     'code' => Response::HTTP_OK,
@@ -122,7 +123,7 @@ class CategoryApiController extends Controller
                     'message' => 'Failed'
                 ]);
             } else {
-                $data['last_updated_by'] = 20;
+                $data['last_updated_by'] =  Auth::user()->id;
                 $result = $this->category_service->update($id, $data);
                 $response = response()->json([
                     'code' => Response::HTTP_OK,

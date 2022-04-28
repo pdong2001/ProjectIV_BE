@@ -2,10 +2,9 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Blob;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ImageAssignResource extends JsonResource
+class ProductOptionResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,7 +16,8 @@ class ImageAssignResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'blob' => new BlobResource(Blob::find($this->blob_id)),
+            'name' => $this->name,
+            'product' => new ProductResource($this->whenLoaded('product')),
         ];
     }
 }

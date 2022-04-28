@@ -44,6 +44,7 @@ class ImageAssignApiController extends Controller
             }
             $data['created_by'] = Auth::user()->id;
             $result = ImageAssign::create($data);
+            
             $response = response()->json([
                 'code' => Response::HTTP_OK,
                 'status' => true,
