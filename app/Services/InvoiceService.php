@@ -8,7 +8,6 @@ use App\Models\InvoiceDetail;
 
 class InvoiceService
 {
-    private readonly CustomerService $customer_service;
     public function __construct(CustomerService $customer_service)
     {
         $this->customer_service = $customer_service;

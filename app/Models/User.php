@@ -24,6 +24,12 @@ class User extends Authenticatable
         'is_admin'
     ];
 
+    public const RULES = [
+        'name' => 'required',
+        'email' => 'required|unique:users',
+        'password' => 'required:confirmed',
+    ];
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -47,5 +53,10 @@ class User extends Authenticatable
     public function cart()
     {
         return $this->hasMany(Cart::class, 'customer_id', 'id');
+    }
+
+    public function customer()
+    {
+        return $this->hasOne(Customer::class, 'user_id', 'id');
     }
 }

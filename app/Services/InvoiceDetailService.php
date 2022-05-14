@@ -10,7 +10,6 @@ use App\Models\ProductDetail;
 
 class InvoiceDetailService
 {
-    private readonly InvoiceService $invoice_service;
 
     public function __construct(InvoiceService $invoice_service)
     {

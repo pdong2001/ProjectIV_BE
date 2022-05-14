@@ -13,7 +13,7 @@ class CustomerService
         $customer = Customer::find($id);
         if ($customer)
         {
-            $customer->dept = Invoice::query()
+            $customer->debt = Invoice::query()
             ->where('customer_id',$customer->id)
             ->where('total', '>', 'paid')
             ->sum('total-paid');

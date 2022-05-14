@@ -30,8 +30,10 @@ class ProductResource extends JsonResource
             'default_image' => new BlobResource($this->whenLoaded('image')),
             'details' => ProductDetailResource::collection($this->whenLoaded('details')),
             'category' => new CategoryResource($this->whenLoaded('category')),
-            'provider' => new CategoryResource($this->whenLoaded('provider')),
+            'provider' => new ProviderResource($this->whenLoaded('provider')),
             'visible' => $this->visible,
+            'min_price' => $this->min_price,
+            'max_price' => $this->max_price,
             'description' => $this->description,
             'options' =>ProductOptionResource::collection($this->whenLoaded('options')),
             ...Product::tArray($this)

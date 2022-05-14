@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Http\Resources\CategoryResource;
-use App\Models\Category;
+use App\Http\Resources\ProviderResource;
+use App\Models\Provider;
 use Illuminate\Support\Facades\Auth;
 
-class CategoryService
+class ProviderService
 {
     public function update($id, array $data)
     {
@@ -14,26 +14,26 @@ class CategoryService
         {
             $data['last_updated_by'] = Auth::user()->id;
         }
-        $updated = Category::where('id', $id)
+        $updated = Provider::where('id', $id)
         ->update($data);
         return $updated > 0;
     }
 
     public function delete($id)
     {
-        return Category::destroy($id);
+        return Provider::destroy($id);
     }
 
-    public function create(array|Category $data)
+    public function create(array|Provider $data)
     {
         if (Auth::check())
         {
             $data['created_by'] = Auth::user()->id;
         }
-        $category = is_array($data) ?
-            Category::create($data)
+        $provider = is_array($data) ?
+            Provider::create($data)
             : $data;
-        if($category->save()) return $category->id;
+        if($provider->save()) return $provider->id;
         else return 0;
     }
 
@@ -43,7 +43,7 @@ class CategoryService
         int $page_size = 10,
         array $option = []
     ) {
-        $query = Category::query();
+        $query = Provider::query();
         if (isset($option['search']) && $option['search'] != '') {
             $query->where('name','LIKE', '%'.$option['search'].'%');
         }
@@ -55,12 +55,12 @@ class CategoryService
             $query->orderBy($orderBy['column'], $orderBy['sort']);
         }
         $query->orderBy('id', 'desc');
-    return CategoryResource::collection($query->paginate($page_size, page: $page_index));
+    return ProviderResource::collection($query->paginate($page_size, page: $page_index));
     }
 
     public function getById(int $id)
     {
-        $query = Category::query();
-        return new CategoryResource($query->find($id));
+        $query = Provider::query();
+        return new ProviderResource($query->find($id));
     }
 }

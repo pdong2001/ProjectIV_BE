@@ -18,6 +18,7 @@ class Category extends AuditedEntity
     protected $searchable = [
         'name'
     ];
+
     protected $fillable = [
         ...parent::FILLABLE,
         'name',
@@ -25,7 +26,7 @@ class Category extends AuditedEntity
     ];
     protected $casts = [
         'visible' => 'boolean',
-      ];
+    ];
 
     public function products()
     {

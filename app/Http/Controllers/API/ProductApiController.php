@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Models\ProductDetail;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,8 +37,15 @@ class ProductApiController extends Controller
                         'search' => $request->get('search') ?? null,
                         'with_detail' => $request->get('with_detail') ?? false,
                         'with_images' => $request->get('with_images') ?? false,
+                        'hasImageOnly' => $request->get('has_image_only') ?? false,
+                        'visible_only' => $request->get('visible_only')??false,
+                        'min_price' => $request->get('min_price') ?? -1,
+                        'max_price' => $request->get('max_price') ?? -1,
+                        'category_id' => $request->get('category')
                     ]
                 );
+                $query = ProductDetail::query();
+                $query->where('visible', 1);
             $productPaginate = ProductResource::collection($data);
             $response = response()->json([
                 'code' => Response::HTTP_OK,
@@ -46,7 +54,8 @@ class ProductApiController extends Controller
                 'meta' => [
                     'total' => $productPaginate->total(),
                     'perPage' => $productPaginate->perPage(),
-                    'currentPage' => $productPaginate->currentPage()
+                    'currentPage' => $productPaginate->currentPage(),
+                    'maxPrice' => $query->max('out_price')
                 ]
             ]);
         } catch (\Throwable $th) {
