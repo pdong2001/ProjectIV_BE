@@ -163,7 +163,6 @@ class ProductService
             $query->where('products.default_image', '!=', 'NULL');
         }
         if ($option['search']) {
-            $option['search'] = str_replace(' ', '%', $option['search']);
             $query->leftJoin('categories', 'categories.id', '=', 'products.category_id');
             $query->where('products.name', 'LIKE', "%" . $option['search'] . "%", "or")
                 ->orWhere('code', 'LIKE', "%" . $option['search'] . "%")
