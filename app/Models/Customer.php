@@ -25,7 +25,11 @@ class Customer extends FullAuditedEntity
         'birth',
         'bank_number',
         'bank_name',
-        'user_id'
+        'user_id',
+        'province',
+        'commune',
+        'blob_id',
+        'district'
     ];
 
     public function user()

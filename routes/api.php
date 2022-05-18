@@ -13,7 +13,9 @@ use App\Http\Controllers\API\ProviderApiController;
 use App\Http\Controllers\API\WebInforApiController;
 use App\Http\Controllers\RegisterApiController;
 use App\Http\Middleware\CORS;
+use App\Http\Resources\CustomerResource;
 use App\Http\Resources\UserResource;
+use App\Models\Blob;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -32,6 +34,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function () {
     Route::get('products/{id}', [ProductApiController::class, 'show']);
+    Route::get('blobs/{id}', function($id) {
+        return Blob::find($id);
+    });
 });
 Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/user', function (Request $request) {
@@ -66,6 +71,20 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
 });
 
 Route::middleware(['auth:api'])->group(function () {
+    Route::get('/user', function (Request $request) {
+        /**
+         * @var User $user
+         */
+        $user = Auth::user();
+        $userResponse = new UserResource($user);
+        $userResponse->customer = new CustomerResource($user->customer);
+        return response()->json([
+            'code' => Response::HTTP_OK,
+            'status' => true,
+            'data' =>$userResponse,
+            'meta' => []
+        ]);
+    });
     Route::post('login', [AuthenticationApiController::class, 'login'])->withoutMiddleware(['auth:api'])->name('auth.login');
     Route::post('logout', [AuthenticationApiController::class, 'logout'])->name('auth.logout');
 });
@@ -78,7 +97,7 @@ Route::get('files/{name}', [FileApiController::class, 'get'])->name('file.get');
 Route::get('blobs/{id}', [FileApiController::class, 'getByBlob'])->name('file.blob');
 Route::get('blobs/{id}', [FileApiController::class, 'getByBlob'])->name('file.blob');
 Route::get('blobs/download/{id}', [FileApiController::class, 'downloadById'])->name('file.blob');
-Route::get('file/download/{name}', [FileApiController::class, 'download'])->name('file.download');
+Route::get('files/download/{name}', [FileApiController::class, 'download'])->name('file.download');
 Route::get('product', [ProductApiController::class, 'index'])->name('home.product');
 Route::get('product/{id}', [ProductApiController::class, 'show'])->name('home.product.show');
 

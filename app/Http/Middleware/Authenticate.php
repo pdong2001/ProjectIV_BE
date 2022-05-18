@@ -24,7 +24,7 @@ class Authenticate extends Middleware
     {
         if (!auth()->check())
         {
-            abort(403);
+            return response(status:401);
         }
         return $next($request);
     }

@@ -140,9 +140,6 @@ class ProductService
         if ($option['consumableOnly'] == 'true') {
             $query->where('quantity', '>', '0');
         }
-        if ($option['category_id'] != null) {
-            $query->where('category_id', $option['category_id']);
-        }
         if ($option['with_images'] == 'true') {
             $query->with('images.blob');
         }
@@ -162,26 +159,30 @@ class ProductService
         if (isset($option['hasImageOnly']) && $option['hasImageOnly'] == 'true') {
             $query->where('products.default_image', '!=', 'NULL');
         }
+        if ($option['category_id'] != null) {
+            $query->where('category_id', '=', $option['category_id']);
+        }
         if ($option['search']) {
+            $option['search'] = str_replace([" ",'_','-'], '.*', trim($option['search']));
             $query->leftJoin('categories', 'categories.id', '=', 'products.category_id');
-            $query->where('products.name', 'LIKE', "%" . $option['search'] . "%", "or")
-                ->orWhere('code', 'LIKE', "%" . $option['search'] . "%")
-                ->orWhere('categories.name', 'LIKE', "%" . $option['search'] . "%");
+            $query->where(function ($query) use ($option) {
+                $query->where('products.name', 'RLIKE', $option['search'], "or")
+                    ->orWhere('code', 'RLIKE', $option['search'])
+                    ->orWhere('categories.name', 'RLIKE', $option['search']);
+            })->select('products.*');
         }
         if (isset($option['visible_only']) && $option['visible_only'] == 'true') {
             $query->where('products.visible', 1);
         }
-        if ($option['max_price'] > 0)
-        {
-            $query->where('max_price' , '<=', $option['max_price']);
+        if ($option['max_price'] > 0) {
+            $query->where('max_price', '<=', $option['max_price']);
         }
         if ($option['min_price'] > 0) {
-            $query->where('min_price' , '>=', $option['min_price']);
+            $query->where('min_price', '>=', $option['min_price']);
         }
         if ($orderBy) {
             $query->orderBy($orderBy['column'], $orderBy['sort']);
         }
-        $query->orderBy('products.id', 'desc');
         return $query->paginate($page_size, page: $page_index);
     }
 
