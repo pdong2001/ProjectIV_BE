@@ -26,6 +26,7 @@ class Product extends FullAuditedEntity
         "deleted_by",
         "is_deleted",
         "description",
+        "short_description",
         'visible',
         'default_detail',
         'min_price',
