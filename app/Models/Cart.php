@@ -11,8 +11,7 @@ class Cart extends Model
 
     protected $table = 'carts';
     public const RULES = [
-        'customer_id' => 'required',
-        'quantity' => 'min:0',
+        'quantity' => 'required|min:0',
         'product_detail_id' => 'required',
     ];
 

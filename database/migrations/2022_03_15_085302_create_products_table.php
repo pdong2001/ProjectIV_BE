@@ -28,6 +28,7 @@ return new class extends Migration
             $table->text('short_description')->fulltext()->nullable();
             $table->text('description')->fulltext()->nullable();
             $table->unsignedBigInteger('default_detail')->nullable();
+            $table->text('information')->nullable();
             Product::Migration($table);
         });
     }

@@ -64,7 +64,7 @@ class AuthenticationApiController extends Controller
             'email' => 'required|email|max:255',
             'password' => 'required'
         ]);
-        $users = User::query()->where('email', $request['email']);
+        $users = User::query()->join("customers", 'customers.user_id','=', 'users.id')->where('email', $request['email'])->select(['users.*']);
         /**
          * @var User $user
          */

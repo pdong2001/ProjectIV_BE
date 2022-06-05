@@ -22,9 +22,9 @@ class InvoiceDetail extends AuditedEntity {
         'product_detail_id',
         'invoice_id',
         'price',
-        'quantity'
+        'quantity',
     ];
-    
+
     public function productDetail()
     {
         return $this->hasOne(ProductDetail::class, 'id', 'product_detail_id');

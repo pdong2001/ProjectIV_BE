@@ -12,28 +12,31 @@ class InvoiceService
     {
         $this->customer_service = $customer_service;
     }
-    public function refresh($id)
-    {
-        $invoice = Invoice::find($id);
-        if ($invoice)
-        {
-            $invoice->total = InvoiceDetail::query()
-            ->where('invoice_id',$invoice->id)
-            ->sum('quantity*price');
-            $invoice->save();
-            $this->customer_service->refresh($invoice->customer_id);    
-        }
-    }
 
     public function update($id, array $data)
     {
         $invoice = Invoice::find($id);
-        $updated = Invoice::where('id', $id)
-        ->update($data);
-        if ($invoice->customer_id != $data['customer_id'])
+        if ($invoice->status == 4 || $invoice->status == 5)
         {
+            return false;
+        }
+        unset($data['status_name']);
+        unset($data['created_at']);
+        unset($data['updated_at']);
+        if ($invoice->customer_id != $data['customer_id']) {
+            $customer = $invoice->customer;
+            $data['customer_name'] = $customer->name;
+            $data['phone_number'] = $customer->phone_number;
+            $data['address'] = $customer->address;
+            $data['district'] = $customer->district;
+            $data['commune'] = $customer->commune;
+            $data['province'] = $customer->province;
+        }
+        $updated = Invoice::where('id', $id)
+            ->update($data);
+        if ($invoice->customer_id != $data['customer_id']) {
             $this->customer_service->refresh($data['customer_id']);
-            $this->customer_service->refresh($invoice->customer_id );
+            $this->customer_service->refresh($invoice->customer_id);
         }
         return $updated > 0;
     }
@@ -41,10 +44,12 @@ class InvoiceService
     public function delete($id)
     {
         $invoice = Invoice::find($id);
-        if ($invoice)
-        {
+        if ($invoice) {
             $deleted = Invoice::destroy($id);
             $this->customer_service->refresh($invoice->customer_id);
+        }
+        else{
+            return 0;
         }
         return $deleted;
     }
@@ -54,12 +59,10 @@ class InvoiceService
         $invoice = is_array($data) ?
             Invoice::create($data)
             : $data;
-        if($invoice->save()) 
-        {
+        if ($invoice->save()) {
             $this->customer_service->refresh($invoice->customer_id);
             return $invoice->id;
-        }
-        else return 0;
+        } else return 0;
     }
 
     public function getAll(
@@ -72,6 +75,9 @@ class InvoiceService
         if ($option['with_detail'] == 'true') {
             $query->with('details.productDetail');
             $query->with('customer');
+        }
+        if (isset($option['customer']) && $option['customer'] != null) {
+            $query->where('customer_id', $option['customer']);
         }
         // if ($option['search']) {
         //     $query->where('name', 'LIKE', "%".$option['search']."%")

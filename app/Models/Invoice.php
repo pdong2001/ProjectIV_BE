@@ -13,10 +13,10 @@ class Invoice extends AuditedEntity {
     // public int $status;
 
     public const RULES = [
-        'customer_id' => 'required_unless:customer_name',
-        'customer_name' => 'required_unless:customer_id',
-        'address' => 'required_unless:customer_id',
-        'phone_number' => 'required_unless:customer_id'
+        'customer_id' => 'required_unless:customer_name,null',
+        'customer_name' => 'required_unless:customer_id,null',
+        'address' => 'required_unless:customer_id,null',
+        'phone_number' => 'required_unless:customer_id,null'
     ];
 
     protected $fillable = [
@@ -26,8 +26,29 @@ class Invoice extends AuditedEntity {
         'paid',
         'customer_name',
         'address',
-        'phone_number'
+        'phone_number',
+        'province',
+        'district',
+        'commune',
+        'option_count'
     ];
+
+    public static function getStatusName(int $status)
+    {
+        switch ($status) {
+            case 1:return "Đang xử lý";
+            case 2:return "Đã chấp nhận";
+            case 3:return "Đang chuẩn bị";
+            case 4:return "Đang giao";
+            case 5:return "Hoàn tất";
+            case 6:return "Từ chối";
+            case 7:return "Yêu cầu hủy";
+            case 8:return "Hủy";
+            case 9:return "Trả hàng";
+            default:
+                return "Đang xử lý";
+        }
+    }
 
     public function details()
     {

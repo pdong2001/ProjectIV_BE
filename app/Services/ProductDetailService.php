@@ -104,6 +104,8 @@ class ProductDetailService
     ) {
         $query = ProductDetail::query();
         $query->with('options');
+        $query->join('products', 'product_details.product_id', '=', 'products.id')
+        ->select(['product_details.*', 'products.name']);
         if ($option['consumableOnly'] == 'true') {
             $query->where('remaining_quantity', '>', '0');
         }
@@ -121,10 +123,10 @@ class ProductDetailService
             $query->with('product.image');
         }
         if (isset($option['search']) && $option['search'] != '') {
-            $query->join('products', 'product_details.product_id', '=', 'products.id')
-                ->where('products.name', 'LIKE', "%" . $option['search'] . "%", 'OR')
-                ->where('product_details.unit', '=', $option['search'], 'OR')
-                ->select(['product_details.*', 'products.name']);
+            $query->where(function ($query) use ($option) {
+                $query->orwhere('products.name', 'RLIKE', $option['search'])
+                    ->orWhere('products.code', 'RLIKE', $option['search']);
+            });
         }
         if ($orderBy) {
             $query->orderBy($orderBy['column'], $orderBy['sort']);

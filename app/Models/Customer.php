@@ -41,4 +41,9 @@ class Customer extends FullAuditedEntity
     {
         return $this->hasMany(Cart::class, 'customer_id', 'id');
     }
+
+    public function image() 
+    {
+        return $this->hasOne(Blob::class, 'id', 'blob_id');
+    }
 }

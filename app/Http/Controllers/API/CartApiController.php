@@ -20,6 +20,24 @@ class CartApiController extends Controller
 
     public function checkOut(Request $request)
     {
+        if (Auth::check()) {
+            /**
+             * @var App/Model/User $user
+             */
+            $user = Auth::user();
+            $deleted = Cart::query()->where('customer_id',  $user->customer->id)->delete();
+
+            return response()->json([
+                'status' => true,
+                'data' => $deleted,
+                'code' => 200
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'code' => 401
+            ]);
+        }
     }
 
     public function Index(Request $request)
@@ -100,9 +118,10 @@ class CartApiController extends Controller
                 ]);
             } else {
                 $user = Auth::user();
-                $customer = $user->customer;
-                $cart = Cart::where('customer_id', $customer->id)->where('product_detail_id', $request->product_detail_id)->firstOrFault();
-                if ($cart) {
+                $customer_id = $user->customer->id;
+                $data['customer_id'] = $customer_id;
+                $cart = Cart::where('customer_id', $customer_id)->where('product_detail_id', $request->product_detail_id)->first();
+                if ($cart != null) {
                     $cart->quantity += $request->quanity;
                     $result = $cart->id;
                     $cart->save();

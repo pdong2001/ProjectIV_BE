@@ -3,47 +3,47 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Invoice;
-use App\Services\InvoiceService;
+use App\Models\Blog;
+use App\Services\BlogService;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\Response;
+// use Symfony\Component\HttpFoundation\Response;
 
-class InvoiceApiController extends Controller
+class BlogApiController extends Controller
 {
-    private InvoiceService $invoice_service;
-    public function __construct(InvoiceService $invoice_service)
+    private BlogService $blog_service;
+    public function __construct(BlogService $blog_service)
     {
-        $this->invoice_service = $invoice_service;
+        $this->blog_service = $blog_service;
     }
     public function Index(Request $request)
     {
         try {
             $orderBy = [];
-            if ($request->get('column') && $request->get('sort')) {
+            if ($request->get('column') != null && $request->get('sort') != null) {
                 $orderBy['sort'] = $request->get('sort');
                 $orderBy['column'] = $request->get('column');
             }
-            $invoicePaginate = $this->invoice_service
+            $blogPaginate = $this->blog_service
                 ->getAll(
                     $orderBy,
                     $request->get('page') ?? 0,
                     $request->get('limit') ?? 10,
                     [
                         'search' => $request->get('search') ?? null,
-                        'with_detail' => $request->get('with_detail') ?? false,
-                        'customer' => $request->get('customer')
+                        'visible_only' => $request->get('visible_only') ?? false
                     ]
                 );
             $response = response()->json([
                 'code' => Response::HTTP_OK,
                 'status' => true,
-                'data' => $invoicePaginate->items(),
+                'data' => $blogPaginate->items(),
                 'meta' => [
-                    'total' => $invoicePaginate->total(),
-                    'perPage' => $invoicePaginate->perPage(),
-                    'currentPage' => $invoicePaginate->currentPage()
+                    'total' => $blogPaginate->total(),
+                    'perPage' => $blogPaginate->perPage(),
+                    'currentPage' => $blogPaginate->currentPage()
                 ]
             ]);
         } catch (\Throwable $th) {
@@ -61,7 +61,7 @@ class InvoiceApiController extends Controller
     {
         try {
             $data = $request->post();
-            $validator = Validator::make($data,  Invoice::RULES);
+            $validator = Validator::make($data,  Blog::RULES);
             if ($validator->fails()) {
                 $response = response()->json([
                     'code' => Response::HTTP_BAD_REQUEST,
@@ -70,13 +70,13 @@ class InvoiceApiController extends Controller
                 ]);
             } else {
                 $data['created_by'] =  Auth::user()->id;
-                    $result = $this->invoice_service->create($data);
-                    $response = response()->json([
-                        'code' => Response::HTTP_OK,
-                        'status' => $result > 0,
-                        'data' => $result,
-                        'meta' => []
-                    ]);
+                $result = $this->blog_service->create($data);
+                $response = response()->json([
+                    'code' => Response::HTTP_OK,
+                    'status' => $result > 0,
+                    'data' => $result,
+                    'meta' => []
+                ]);
             }
         } catch (\Throwable $th) {
             $response = response()->json([
@@ -91,7 +91,7 @@ class InvoiceApiController extends Controller
     public function show(Request $request, $id)
     {
         try {
-            $result = $this->invoice_service->getById($id);
+            $result = $this->blog_service->getById($id);
             $response = response()->json([
                 'code' => Response::HTTP_OK,
                 'status' => true,
@@ -112,14 +112,26 @@ class InvoiceApiController extends Controller
     {
         try {
             $data = $request->all();
-            $data['last_updated_by'] =  Auth::user()->id;
-            $result = $this->invoice_service->update($id, $data);
-            $response = response()->json([
-                'code' => Response::HTTP_OK,
-                'status' => $result,
-                'data' => $id,
-                'meta' => []
-            ]);
+            $rules = Blog::RULES;
+            $rules['name'] .= ',name,' . $id;
+            $validator = Validator::make($data,  $rules);
+            if ($validator->fails()) {
+                $response = response()->json([
+                    'code' => Response::HTTP_BAD_REQUEST,
+                    'status' => false,
+                    'meta' => $validator->errors(),
+                    'message' => 'Failed'
+                ]);
+            } else {
+                $data['last_updated_by'] =  Auth::user()->id;
+                $result = $this->blog_service->update($id, $data);
+                $response = response()->json([
+                    'code' => Response::HTTP_OK,
+                    'status' => $result,
+                    'data' => $id,
+                    'meta' => []
+                ]);
+            }
         } catch (\Throwable $th) {
             $response = response()->json([
                 'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
@@ -133,7 +145,7 @@ class InvoiceApiController extends Controller
     public function destroy(Request $request, $id)
     {
         try {
-            $result = $this->invoice_service->delete($id);
+            $result = $this->blog_service->delete($id);
             $response = response()->json([
                 'code' => Response::HTTP_OK,
                 'status' => $result > 0,
