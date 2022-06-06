@@ -61,13 +61,23 @@ class CartService
         return Cart::destroy($id);
     }
 
-    public function create(array|Cart $data)
+    public function create(array $data)
     {
-        $cart = is_array($data) ?
-            Cart::create($data)
-            : $data;
-        if ($cart->save()) return $cart->id;
-        else return 0;
+        $cart = Cart::where('product_detail_id', $data['product_detail_id'])->where('customer_id', $data['customer_id'])->first();
+        if ($cart != null) {
+            $cart->quantity += $data['quantity'];
+            if( $cart->save())
+            {
+                return $cart->id;
+            }
+            return 0;
+        } else {
+
+            $cart =
+                Cart::create($data);
+            if ($cart->save()) return $cart->id;
+        }
+        return 0;
     }
 
     public function getAll(

@@ -120,14 +120,8 @@ class CartApiController extends Controller
                 $user = Auth::user();
                 $customer_id = $user->customer->id;
                 $data['customer_id'] = $customer_id;
-                $cart = Cart::where('customer_id', $customer_id)->where('product_detail_id', $request->product_detail_id)->first();
-                if ($cart != null) {
-                    $cart->quantity += $request->quanity;
-                    $result = $cart->id;
-                    $cart->save();
-                } else {
-                    $result = $this->cart_service->create($data);
-                }
+
+                $result = $this->cart_service->create($data);
                 $response = response()->json([
                     'code' => Response::HTTP_OK,
                     'status' => $result > 0,

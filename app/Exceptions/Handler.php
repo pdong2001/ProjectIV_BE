@@ -42,15 +42,15 @@ class Handler extends ExceptionHandler
         });
     }
 
-    public function render($request, Throwable $e)
-    {
-        if ($e->getCode() != 401) {
-            return response(status:$e->getCode())->json([
-                'code' => $e->getCode(),
-                'status' => false,
-                'message' => $e->getMessage(),
-                'trace' => $e->getTrace(),
-            ]);
-        }
-    }
+    // public function render($request, Throwable $e)
+    // {
+    //     if ($e->getCode() != 401) {
+    //         return response(status:$e->getCode())->json([
+    //             'code' => $e->getCode(),
+    //             'status' => false,
+    //             'message' => $e->getMessage(),
+    //             'trace' => $e->getTrace(),
+    //         ]);
+    //     }
+    // }
 }
