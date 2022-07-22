@@ -79,6 +79,9 @@ class InvoiceService
         if (isset($option['customer']) && $option['customer'] != null) {
             $query->where('customer_id', $option['customer']);
         }
+        if (isset($option['status']) && $option['status'] != null) {
+            $query->where('status', $option['status']);
+        }
         // if ($option['search']) {
         //     $query->where('name', 'LIKE', "%".$option['search']."%")
         //     ->orWhere('code', 'LIKE', "%".$option['search']."%");

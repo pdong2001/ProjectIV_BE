@@ -33,7 +33,8 @@ class InvoiceApiController extends Controller
                     [
                         'search' => $request->get('search') ?? null,
                         'with_detail' => $request->get('with_detail') ?? false,
-                        'customer' => $request->get('customer')
+                        'customer' => $request->get('customer'),
+                        'status' => $request->get('status')
                     ]
                 );
             $response = response()->json([

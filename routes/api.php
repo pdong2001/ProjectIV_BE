@@ -104,7 +104,6 @@ Route::post('upload', [FileApiController::class, 'upload'])->name('file.upload')
 Route::delete('blobs/{id}', [FileApiController::class, 'delete'])->name('blob.delete')->middleware(['auth:api']);
 Route::get('files/{name}', [FileApiController::class, 'get'])->name('file.get');
 Route::get('blobs/{id}', [FileApiController::class, 'getByBlob'])->name('file.blob');
-Route::get('blobs/{id}', [FileApiController::class, 'getByBlob'])->name('file.blob');
 Route::get('blobs/download/{id}', [FileApiController::class, 'downloadById'])->name('file.blob');
 Route::get('files/download/{name}', [FileApiController::class, 'download'])->name('file.download');
 Route::get('product', [ProductApiController::class, 'index'])->name('home.product');

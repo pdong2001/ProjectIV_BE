@@ -25,6 +25,7 @@ class InvoiceDetailResource extends JsonResource
             'price' => $this->price,
             'quantity' => $this->quantity,
             'total' => $this->quantity * $this->price,
+            'created_at' => $this->created_at
         ];
     }
 }
