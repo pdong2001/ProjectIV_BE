@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('name')->fulltext();
             $table->string('address')->fulltext()->nullable();
             $table->string('phone')->fulltext()->nullable();
+            $table->string('file_path')->nullable();
             $table->boolean('visible')->default(true);
             Provider::Migration($table);
         });

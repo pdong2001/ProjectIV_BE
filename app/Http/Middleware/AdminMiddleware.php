@@ -18,7 +18,7 @@ class AdminMiddleware
     {
         if (!auth()->check() || !auth()->user()->is_admin)
         {
-            abort(code:403);
+            return response(status:401);
         }
         return $next($request);
     }

@@ -11,8 +11,7 @@ class Cart extends Model
 
     protected $table = 'carts';
     public const RULES = [
-        'customer_id' => 'required',
-        'quantity' => 'min:0',
+        'quantity' => 'required|min:0',
         'product_detail_id' => 'required',
     ];
 
@@ -26,6 +25,7 @@ class Cart extends Model
     {
         return $this->hasOne(ProductDetail::class, 'id', 'product_detail_id');
     }
+    
     public function customer()
     {
         return $this->belongsTo(Customer::class, 'customer_id', 'id');

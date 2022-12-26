@@ -19,6 +19,7 @@ class CategoryResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'visible' => $this->visible,
+            'product_count' => $this->product_count,
             'products' => $this->whenLoaded('products'),
             ...Category::tArray($this)
         ];

@@ -2,10 +2,9 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Blob;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CustomerResource extends JsonResource
+class WebInfoResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,8 +14,10 @@ class CustomerResource extends JsonResource
      */
     public function toArray($request)
     {
-        $result = parent::toArray($request);
-        $result['image'] = new BlobResource(Blob::find($this->blob_id));
-        return $result;
+        return
+            [
+                ...parent::toArray($request),
+                'image' => new BlobResource($this->whenLoaded('image'))
+            ];
     }
 }

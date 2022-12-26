@@ -12,28 +12,6 @@ class Product extends FullAuditedEntity
         'name' => 'required',
     ];
     protected $table = 'products';
-    // public ?int $provider_id;
-    // public string $name;
-    // public array $details;
-    // public array $images;
-    // public ?int $category_id;
-    // public ?int $default_image;
-    // public string $code;
-    // public int $option_count;
-
-    // public function __construct(array $data = [])
-    // {
-    //     if ($data)
-    //     {
-    //         $this->provider_id = $data['provider_id']??null;
-    //         $this->name = $data['name']??'';
-    //         $this->code = $data['provider_id']??null;
-    //         $this->category_id = $data['category_id']??null;
-    //         $this->default_image = $data['default_image']??null;
-    //         $this->category_id = $data['category_id']??null;
-    //         $this->option_count = $data['option_count']??0;
-    //     }
-    // }
 
     protected $fillable = [
         "provider_id",
@@ -48,8 +26,11 @@ class Product extends FullAuditedEntity
         "deleted_by",
         "is_deleted",
         "description",
+        "short_description",
         'visible',
-        'default_detail'
+        'default_detail',
+        'min_price',
+        'max_price'
     ];
 
     protected $casts = [

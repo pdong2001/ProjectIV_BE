@@ -15,7 +15,7 @@ class ProductResource extends JsonResource
      */
     public function toArray($request)
     {
-        $category = $this->whenLoaded(relationship:'category');
+        $category = $this->whenLoaded(relationship: 'category');
         return [
             'id' => $this->id,
             'provider_id' => $this->provider_id,
@@ -27,14 +27,21 @@ class ProductResource extends JsonResource
             'option_count' => $this->option_count,
             'quantity' => $this->quantity,
             'images' => ImageAssignResource::collection($this->whenLoaded('images')),
-            'default_image' => new BlobResource($this->whenLoaded('image')),
+            'image' => new BlobResource($this->whenLoaded('image')),
             'details' => ProductDetailResource::collection($this->whenLoaded('details')),
             'category' => new CategoryResource($this->whenLoaded('category')),
-            'provider' => new CategoryResource($this->whenLoaded('provider')),
+            'provider' => new ProviderResource($this->whenLoaded('provider')),
             'visible' => $this->visible,
+            'min_price' => $this->min_price,
+            'max_price' => $this->max_price,
             'description' => $this->description,
-            'options' =>ProductOptionResource::collection($this->whenLoaded('options')),
-            ...Product::tArray($this)
+            'short_description' => $this->short_description,
+            'options' => ProductOptionResource::collection($this->whenLoaded('options')),
+            'note' => $this->note,
+            'created_by' => $this->created_by,
+            'created_at' => $this->created_at,
+            'updated_by' => $this->last_updated_by,
+            'updated_at' => $this->updated_at
         ];
     }
 }

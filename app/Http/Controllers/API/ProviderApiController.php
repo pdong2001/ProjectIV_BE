@@ -3,21 +3,20 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ProductResource;
-use App\Models\Product;
-use App\Models\ProductDetail;
-use App\Services\ProductService;
+use App\Models\Provider;
+use App\Services\ProviderService;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\Response;
+// use Symfony\Component\HttpFoundation\Response;
 
-class ProductApiController extends Controller
+class ProviderApiController extends Controller
 {
-    private ProductService $product_service;
-    public function __construct(ProductService $product_service)
+    private ProviderService $provider_service;
+    public function __construct(ProviderService $provider_service)
     {
-        $this->product_service = $product_service;
+        $this->provider_service = $provider_service;
     }
     public function Index(Request $request)
     {
@@ -27,35 +26,24 @@ class ProductApiController extends Controller
                 $orderBy['sort'] = $request->get('sort');
                 $orderBy['column'] = $request->get('column');
             }
-            $data = $this->product_service
+            $providerPaginate = $this->provider_service
                 ->getAll(
                     $orderBy,
                     $request->get('page') ?? 0,
                     $request->get('limit') ?? 10,
                     [
-                        'consumableOnly' => $request->get('consumable_only') ?? false,
                         'search' => $request->get('search') ?? null,
-                        'with_detail' => $request->get('with_detail') ?? false,
-                        'with_images' => $request->get('with_images') ?? false,
-                        'hasImageOnly' => $request->get('has_image_only') ?? false,
-                        'visible_only' => $request->get('visible_only')??false,
-                        'min_price' => $request->get('min_price') ?? -1,
-                        'max_price' => $request->get('max_price') ?? -1,
-                        'category_id' => $request->get('category')
+                        'visible_only' => $request->get('visible_only') ?? false
                     ]
                 );
-                $query = ProductDetail::query();
-                $query->where('visible', 1);
-            $productPaginate = ProductResource::collection($data);
             $response = response()->json([
                 'code' => Response::HTTP_OK,
                 'status' => true,
-                'data' => $productPaginate->items(),
+                'data' => $providerPaginate->items(),
                 'meta' => [
-                    'total' => $productPaginate->total(),
-                    'perPage' => $productPaginate->perPage(),
-                    'currentPage' => $productPaginate->currentPage(),
-                    'maxPrice' => $query->max('out_price')
+                    'total' => $providerPaginate->total(),
+                    'perPage' => $providerPaginate->perPage(),
+                    'currentPage' => $providerPaginate->currentPage()
                 ]
             ]);
         } catch (\Throwable $th) {
@@ -73,10 +61,7 @@ class ProductApiController extends Controller
     {
         try {
             $data = $request->post();
-            $validator = Validator::make($data,  [
-                ...Product::RULES,
-                'options' => 'required|min:1'
-            ]);
+            $validator = Validator::make($data,  Provider::RULES);
             if ($validator->fails()) {
                 $response = response()->json([
                     'code' => Response::HTTP_BAD_REQUEST,
@@ -85,11 +70,12 @@ class ProductApiController extends Controller
                 ]);
             } else {
                 $data['created_by'] =  Auth::user()->id;
-                $result = $this->product_service->create($data, $data['options']);
+                $result = $this->provider_service->create($data);
                 $response = response()->json([
                     'code' => Response::HTTP_OK,
                     'status' => $result > 0,
                     'data' => $result,
+                    
                     'meta' => []
                 ]);
             }
@@ -106,7 +92,7 @@ class ProductApiController extends Controller
     public function show(Request $request, $id)
     {
         try {
-            $result = $this->product_service->getById($id);
+            $result = $this->provider_service->getById($id);
             $response = response()->json([
                 'code' => Response::HTTP_OK,
                 'status' => true,
@@ -125,24 +111,41 @@ class ProductApiController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validate($request, Product::RULES);
-        $data = $request->except('options');
-        $data['last_updated_by'] =  Auth::user()->id;
-        $result = $this->product_service->update($id, $data, $request->options);
-        $response = response()->json([
-            'code' => Response::HTTP_OK,
-            'status' => $result,
-            'data' => $id,
-            'meta' => []
-        ]);
-
+        try {
+            $data = $request->except('image');
+            $rules = Provider::RULES;
+            $validator = Validator::make($data,  $rules);
+            if ($validator->fails()) {
+                $response = response()->json([
+                    'code' => Response::HTTP_BAD_REQUEST,
+                    'status' => false,
+                    'meta' => $validator->errors(),
+                    'message' => 'Failed'
+                ]);
+            } else {
+                $data['last_updated_by'] =  Auth::user()->id;
+                $result = $this->provider_service->update($id, $data);
+                $response = response()->json([
+                    'code' => Response::HTTP_OK,
+                    'status' => $result,
+                    'data' => $id,
+                    'meta' => []
+                ]);
+            }
+        } catch (\Throwable $th) {
+            $response = response()->json([
+                'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'status' => false,
+                'message' => $th->getMessage()
+            ]);
+        }
         return $response;
     }
 
     public function destroy(Request $request, $id)
     {
         try {
-            $result = $this->product_service->delete($id);
+            $result = $this->provider_service->delete($id);
             $response = response()->json([
                 'code' => Response::HTTP_OK,
                 'status' => $result > 0,

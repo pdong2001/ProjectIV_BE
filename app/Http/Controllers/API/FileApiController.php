@@ -86,7 +86,7 @@ class FileApiController extends Controller
             $blob = Blob::create([
                 'name' => $request->get('name') ?? $file->getClientOriginalName(),
                 'file_path' => $result,
-                'created_by' =>  Auth::user()->id
+                'created_by' => 1
             ]);
             return response()->json([
                 'code' => Response::HTTP_OK,

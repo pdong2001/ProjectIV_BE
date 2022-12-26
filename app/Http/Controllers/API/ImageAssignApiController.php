@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ImageAssignResource;
 use App\Models\Blob;
 use App\Models\ImageAssign;
+use App\Models\ProductDetail;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -64,10 +65,24 @@ class ImageAssignApiController extends Controller
     public function destroy(Request $request, $id)
     {
         try {
-            $result = ImageAssign::destroy($id);
+            $assign = ImageAssign::find($id);
+            if ($assign)
+            {
+                if ($assign->imageable_type == 'App\\Models\\Product')
+                {
+                    ProductDetail::where('product_id', $assign->imageable_id)
+                    ->where('default_image',$assign->blob_id)
+                    ->delete();
+                }
+                $result = $assign->delete();
+            }
+            else
+            {
+                $result = false;
+            }
             $response = response()->json([
                 'code' => Response::HTTP_OK,
-                'status' => $result > 0,
+                'status' => $result,
                 'data' => $id,
                 'meta' => []
             ]);

@@ -19,16 +19,25 @@ return new class extends Migration
             $table->string('name');
             $table->string('address')->nullable();
             $table->string('phone_number')->nullable();
+            $table->string('province')->nullable();
+            $table->string('district')->nullable();
+            $table->string('commune')->nullable();
             $table->bigInteger('debt')->default(0);
             $table->date('birth')->nullable();
             $table->string('bank_number')->nullable();
             $table->string('bank_name')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('blob_id')->nullable();
             $table->foreign('user_id')
-            ->references('id')
-            ->on('users')
-            ->cascadeOnUpdate()
-            ->nullOnDelete();
+                ->references('id')
+                ->on('users')
+                ->cascadeOnUpdate()
+                ->nullOnDelete();
+            $table->foreign('blob_id')
+                ->references('id')
+                ->on('blobs')
+                ->cascadeOnUpdate()
+                ->nullOnDelete();
         });
     }
 

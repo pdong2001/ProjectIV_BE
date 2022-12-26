@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
             return new InvoiceService($app->make(CustomerService::class));
         });
         $this->app->bind(InvoiceDetailService::class, function($app) {
-            return new InvoiceDetailService($app->make(InvoiceService::class));
+            return new InvoiceDetailService($app->make(InvoiceService::class), $app->make(CustomerService::class));
         });
         $this->app->bind(CustomerService::class, function($app) {
             return new CustomerService();

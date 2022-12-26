@@ -20,7 +20,6 @@ class ProductDetail extends FullAuditedEntity
 
     public const RULES = [
         'product_id' => 'required',
-        'in_price' => 'required|min:0',
         'out_price' => 'required|min:0',
         'unit' => 'required',
         'options' => 'required'

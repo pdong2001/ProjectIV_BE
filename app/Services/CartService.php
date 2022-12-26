@@ -14,24 +14,20 @@ class CartService
 {
     public function checkOut(array $data)
     {
-        $validator = Validator::make($data,Invoice::RULES);
-        if (!$validator->failed())
-        {
-            if (!isset($data['customer_id']))
-            {
+        $validator = Validator::make($data, Invoice::RULES);
+        if (!$validator->failed()) {
+            if (!isset($data['customer_id'])) {
                 $customer = Customer::create([
                     'name' => $data['customer_name'],
                     'address' => $data['address'],
                     'phone_number' => $data['phone_number'],
                 ]);
             }
-            if ($customer->save())
-            {
+            if ($customer->save()) {
                 $data['customer_id'] = $customer->id;
             }
             $invoice = Invoice::create($data);
-            if ($invoice->save())
-            {
+            if ($invoice->save()) {
                 $cart_products = Cart::find($data['carts']);
                 $details = [];
                 foreach ($cart_products as $value) {
@@ -39,26 +35,24 @@ class CartService
                         'product_detail_id' => $value->product_detail_id,
                         'quantity' => $value->quantity,
                         'price' => $value->productDetail->out_price,
-                        'invoice_id' => $invoice->id 
+                        'invoice_id' => $invoice->id
                     ]));
                 }
-                if (DB::table('invoice_details')->insert($details))
-                {
+                if (DB::table('invoice_details')->insert($details)) {
                     Cart::destroy($cart_products);
                     $invoice->total = InvoiceDetail::query()
-                    ->where('invoice_id',$invoice->id)
-                    ->sum('quantity*price');
+                        ->where('invoice_id', $invoice->id)
+                        ->sum('quantity*price');
                     $invoice->save();
                 }
             }
-            
         }
     }
 
     public function update($id, array $data)
     {
         $updated = Cart::where('id', $id)
-        ->update($data);
+            ->update($data);
         return $updated > 0;
     }
 
@@ -67,13 +61,23 @@ class CartService
         return Cart::destroy($id);
     }
 
-    public function create(array|Cart $data)
+    public function create(array $data)
     {
-        $cart = is_array($data) ?
-            Cart::create($data)
-            : $data;
-        if($cart->save()) return $cart->id;
-        else return 0;
+        $cart = Cart::where('product_detail_id', $data['product_detail_id'])->where('customer_id', $data['customer_id'])->first();
+        if ($cart != null) {
+            $cart->quantity += $data['quantity'];
+            if( $cart->save())
+            {
+                return $cart->id;
+            }
+            return 0;
+        } else {
+
+            $cart =
+                Cart::create($data);
+            if ($cart->save()) return $cart->id;
+        }
+        return 0;
     }
 
     public function getAll(
@@ -84,10 +88,11 @@ class CartService
     ) {
         $query = Cart::query();
         if ($option['with_detail'] == 'true') {
-            $query->with('productDetail.product');
+            $query->with('productDetail.image');
+            $query->with('productDetail.product.image');
+            $query->with('productDetail.options');
         }
-        if (isset($option['customer_id']) && $option['customer_id'] != null)
-        {
+        if (isset($option['customer_id']) && $option['customer_id'] != null) {
             $query->where('customer_id', $option['customer_id']);
         }
         // if ($option['search']) {

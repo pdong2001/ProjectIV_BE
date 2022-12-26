@@ -3,59 +3,47 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ProductResource;
-use App\Models\Product;
-use App\Models\ProductDetail;
-use App\Services\ProductService;
+use App\Models\Blog;
+use App\Services\BlogService;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\Response;
+// use Symfony\Component\HttpFoundation\Response;
 
-class ProductApiController extends Controller
+class BlogApiController extends Controller
 {
-    private ProductService $product_service;
-    public function __construct(ProductService $product_service)
+    private BlogService $blog_service;
+    public function __construct(BlogService $blog_service)
     {
-        $this->product_service = $product_service;
+        $this->blog_service = $blog_service;
     }
     public function Index(Request $request)
     {
         try {
             $orderBy = [];
-            if ($request->get('column') && $request->get('sort')) {
+            if ($request->get('column') != null && $request->get('sort') != null) {
                 $orderBy['sort'] = $request->get('sort');
                 $orderBy['column'] = $request->get('column');
             }
-            $data = $this->product_service
+            $blogPaginate = $this->blog_service
                 ->getAll(
                     $orderBy,
                     $request->get('page') ?? 0,
                     $request->get('limit') ?? 10,
                     [
-                        'consumableOnly' => $request->get('consumable_only') ?? false,
                         'search' => $request->get('search') ?? null,
-                        'with_detail' => $request->get('with_detail') ?? false,
-                        'with_images' => $request->get('with_images') ?? false,
-                        'hasImageOnly' => $request->get('has_image_only') ?? false,
-                        'visible_only' => $request->get('visible_only')??false,
-                        'min_price' => $request->get('min_price') ?? -1,
-                        'max_price' => $request->get('max_price') ?? -1,
-                        'category_id' => $request->get('category')
+                        'visible_only' => $request->get('visible_only') ?? false
                     ]
                 );
-                $query = ProductDetail::query();
-                $query->where('visible', 1);
-            $productPaginate = ProductResource::collection($data);
             $response = response()->json([
                 'code' => Response::HTTP_OK,
                 'status' => true,
-                'data' => $productPaginate->items(),
+                'data' => $blogPaginate->items(),
                 'meta' => [
-                    'total' => $productPaginate->total(),
-                    'perPage' => $productPaginate->perPage(),
-                    'currentPage' => $productPaginate->currentPage(),
-                    'maxPrice' => $query->max('out_price')
+                    'total' => $blogPaginate->total(),
+                    'perPage' => $blogPaginate->perPage(),
+                    'currentPage' => $blogPaginate->currentPage()
                 ]
             ]);
         } catch (\Throwable $th) {
@@ -73,10 +61,7 @@ class ProductApiController extends Controller
     {
         try {
             $data = $request->post();
-            $validator = Validator::make($data,  [
-                ...Product::RULES,
-                'options' => 'required|min:1'
-            ]);
+            $validator = Validator::make($data,  Blog::RULES);
             if ($validator->fails()) {
                 $response = response()->json([
                     'code' => Response::HTTP_BAD_REQUEST,
@@ -85,7 +70,7 @@ class ProductApiController extends Controller
                 ]);
             } else {
                 $data['created_by'] =  Auth::user()->id;
-                $result = $this->product_service->create($data, $data['options']);
+                $result = $this->blog_service->create($data);
                 $response = response()->json([
                     'code' => Response::HTTP_OK,
                     'status' => $result > 0,
@@ -106,7 +91,7 @@ class ProductApiController extends Controller
     public function show(Request $request, $id)
     {
         try {
-            $result = $this->product_service->getById($id);
+            $result = $this->blog_service->getById($id);
             $response = response()->json([
                 'code' => Response::HTTP_OK,
                 'status' => true,
@@ -125,24 +110,40 @@ class ProductApiController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validate($request, Product::RULES);
-        $data = $request->except('options');
-        $data['last_updated_by'] =  Auth::user()->id;
-        $result = $this->product_service->update($id, $data, $request->options);
-        $response = response()->json([
-            'code' => Response::HTTP_OK,
-            'status' => $result,
-            'data' => $id,
-            'meta' => []
-        ]);
-
+        try {
+            $data = $request->all();
+            $rules = Blog::RULES;
+            $validator = Validator::make($data,  $rules);
+            if ($validator->fails()) {
+                $response = response()->json([
+                    'code' => Response::HTTP_BAD_REQUEST,
+                    'status' => false,
+                    'meta' => $validator->errors(),
+                    'message' => 'Failed'
+                ]);
+            } else {
+                $result = $this->blog_service->update($id, $data);
+                $response = response()->json([
+                    'code' => Response::HTTP_OK,
+                    'status' => $result,
+                    'data' => $id,
+                    'meta' => []
+                ]);
+            }
+        } catch (\Throwable $th) {
+            $response = response()->json([
+                'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'status' => false,
+                'message' => $th->getMessage()
+            ]);
+        }
         return $response;
     }
 
     public function destroy(Request $request, $id)
     {
         try {
-            $result = $this->product_service->delete($id);
+            $result = $this->blog_service->delete($id);
             $response = response()->json([
                 'code' => Response::HTTP_OK,
                 'status' => $result > 0,

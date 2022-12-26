@@ -22,9 +22,8 @@ class Authenticate extends Middleware
     // }
     public function handle($request, Closure $next, ...$guards)
     {
-        if (!auth()->check())
-        {
-            abort(403);
+        if (!Auth::check()) {
+            return response(status: 401);
         }
         return $next($request);
     }
