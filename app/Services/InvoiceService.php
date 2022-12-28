@@ -11,13 +11,13 @@ class InvoiceService
     public function __construct(CustomerService $customer_service)
     {
         $this->customer_service = $customer_service;
+        $this->invoice_service = new InvoiceDetailService($this, $this->customer_service);
     }
 
     public function update($id, array $data)
     {
         $invoice = Invoice::find($id);
-        if ($invoice->status == 4 || $invoice->status == 5)
-        {
+        if ($invoice->status == 7 || $invoice->status == 5) {
             return false;
         }
         unset($data['status_name']);
@@ -47,8 +47,7 @@ class InvoiceService
         if ($invoice) {
             $deleted = Invoice::destroy($id);
             $this->customer_service->refresh($invoice->customer_id);
-        }
-        else{
+        } else {
             return 0;
         }
         return $deleted;

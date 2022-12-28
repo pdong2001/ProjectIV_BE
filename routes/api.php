@@ -77,6 +77,10 @@ Route::middleware(['admin', 'auth:api'])->prefix('admin')->group(function () {
 });
 
 Route::middleware(['auth:api'])->group(function () {
+    Route::post(
+        'admin/invoices/create',
+        [InvoiceApiController::class, "store"]
+    );
     Route::get('/user', function (Request $request) {
         /**
          * @var User $user

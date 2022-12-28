@@ -17,8 +17,8 @@ class DatabaseSeeder extends Seeder
     {
         \App\Models\User::factory(10)->create();
         (new CategorySeeder())->run();
-        (new ProductSeeder())->run();
+        // (new ProductSeeder())->run();
         // (new ProductDetailSeeder())->run();
-        (new ProductOptionSeeder())->run();
+        // (new ProductOptionSeeder())->run();
     }
 }

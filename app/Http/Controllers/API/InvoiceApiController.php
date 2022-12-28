@@ -71,13 +71,13 @@ class InvoiceApiController extends Controller
                 ]);
             } else {
                 $data['created_by'] =  Auth::user()->id;
-                    $result = $this->invoice_service->create($data);
-                    $response = response()->json([
-                        'code' => Response::HTTP_OK,
-                        'status' => $result > 0,
-                        'data' => $result,
-                        'meta' => []
-                    ]);
+                $result = $this->invoice_service->create($data);
+                $response = response()->json([
+                    'code' => Response::HTTP_OK,
+                    'status' => $result > 0,
+                    'data' => $result,
+                    'meta' => []
+                ]);
             }
         } catch (\Throwable $th) {
             $response = response()->json([

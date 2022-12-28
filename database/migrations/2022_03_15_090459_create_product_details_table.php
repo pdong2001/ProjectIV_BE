@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('out_price');
             $table->unsignedBigInteger('in_price')->nullable();
             $table->bigInteger('remaining_quantity');
-            $table->unsignedBigInteger('total_quantity');
+            $table->unsignedBigInteger('total_quantity')->nullable();
             $table->boolean('visible')->default(true);
             $table->unsignedBigInteger('default_image')->nullable();
             $table->string('unit', 50);

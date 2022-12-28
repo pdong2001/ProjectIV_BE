@@ -65,7 +65,7 @@ class ProductDetailService
             new ProductDetail($data)
             : $data;
         if (!isset($options) || count($options) != Product::find($data['product_id'])->options()->count()) {
-            throw new Error('Invalid options', 403);
+            throw new Error('Invalid options', 400);
         }
         if ($productDetail->save()) {
             foreach ($options as $key => $value) {

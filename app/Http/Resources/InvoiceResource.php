@@ -32,7 +32,8 @@ class InvoiceResource extends JsonResource
             'updated_at' => $this->updated_at,
             'details' => InvoiceDetailResource::collection($this->whenLoaded('details')),
             'status' => $this->status,
-            'status_name' => Invoice::getStatusName($this->status)
+            'status_name' => Invoice::getStatusName($this->status),
+            'cancel_pending' => $this->cancel_pending
         ];
     }
 }

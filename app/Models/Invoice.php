@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Models;
 
 use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Invoice extends AuditedEntity {
+class Invoice extends AuditedEntity
+{
     use HasStatus, HasFactory;
     protected $table = 'invoices';
     // public int $user_id;
@@ -30,21 +32,29 @@ class Invoice extends AuditedEntity {
         'province',
         'district',
         'commune',
-        'option_count'
+        'option_count',
+        'cancel_pending'
     ];
 
     public static function getStatusName(int $status)
     {
         switch ($status) {
-            case 1:return "Đang xử lý";
-            case 2:return "Đã chấp nhận";
-            case 3:return "Đang chuẩn bị";
-            case 4:return "Đang giao";
-            case 5:return "Hoàn tất";
-            case 6:return "Từ chối";
-            case 7:return "Yêu cầu hủy";
-            case 8:return "Hủy";
-            case 9:return "Trả hàng";
+            case 1:
+                return "Đang xử lý";
+            case 2:
+                return "Đã chấp nhận";
+            case 3:
+                return "Đang chuẩn bị";
+            case 4:
+                return "Đang giao";
+            case 5:
+                return "Hoàn tất";
+            case 6:
+                return "Từ chối";
+            case 7:
+                return "Hủy";
+            case 8:
+                return "Trả hàng";
             default:
                 return "Đang xử lý";
         }
